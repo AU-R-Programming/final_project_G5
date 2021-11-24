@@ -14,19 +14,12 @@ beta_hat_func = function(y, x, beta){
     return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
 }
 
-#Test data
+#Test data (example is forestfires.csv)
 y<- class_data[,"ISI"]
 x<- class_data[,c("temp","wind")]
 x<- cbind(1,x)
 
-#initial beta
-beta_zero<- c(mean(y), cov(y,x[,2])/var(x[,2]), cov(y,x[,3])/var(x[,3]) )
 
-#make sure beta hat function works for y x and betazero
-
-beta_hat_func(y,x,beta_zero)
-
-#linear regression model
 
 my_lm = function(response, covariates, alpha = 0.05) {
   
@@ -39,8 +32,26 @@ my_lm = function(response, covariates, alpha = 0.05) {
   p <- dim(covariates)[2]
   df <- n - p
   
-  # Estimate beta through optimization(see above in example)
+  # Estimate beta through optimization()
+  x= covariates
+  y= response
+  beta_zero<- NA
+  p<- dim(x)[2]
+  beta_zero[1] <- mean(y)
+
+  #continuing to fill in beta_zero
+
+  for (i in 2:p) {
+    beta_zero[i]<- cov(y,x[,i])/var(x[,i])
+  }
+
   
+  #make sure beta hat function works for y x and betazero
+  
+  beta_hat_func(y,x,beta_zero)
+  
+  betahat_optimize<- optim(beta_zero, function (z) beta_hat_func(y,x,z))
+  beta.hat<- betahat_optimize $par
   
   # Estimate of the residual variance (sigma2) from Eq. (6.3)
   # Compute residuals
@@ -48,7 +59,8 @@ my_lm = function(response, covariates, alpha = 0.05) {
   sigma2.hat <- (1/df)*t(resid)%*%resid
   
   # Estimate of the variance of the estimated beta from Eq. (6.2)
-  var.beta <- sigma2.hat*solve(t(covariates)%*%covariates)
+  var.beta <- as.vector(sigma2.hat)*diag(solve(t(covariates)%*%covariates))
+  #var.beta <- sigma2.hat*solve(t(covariates)%*%covariates)
   
   # Estimate of the confidence interval based on alpha
   quant <- 1 - alpha/2
@@ -60,6 +72,6 @@ my_lm = function(response, covariates, alpha = 0.05) {
               variance_beta = var.beta, ci = ci.beta))
 }
 
-
+my_lm(y,x)
 ```
 

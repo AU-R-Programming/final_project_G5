@@ -179,20 +179,12 @@ beta_hat_func = function(y, x, beta){
     return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
 }
 
-#Test data
+#Test data (example is forestfires.csv)
 y&lt;- class_data[,&quot;ISI&quot;]
 x&lt;- class_data[,c(&quot;temp&quot;,&quot;wind&quot;)]
 x&lt;- cbind(1,x)
 
-#initial beta
-beta_zero&lt;- c(mean(y), cov(y,x[,2])/var(x[,2]), cov(y,x[,3])/var(x[,3]) )
 
-#make sure beta hat function works for y x and betazero
-
-beta_hat_func(y,x,beta_zero)</code></pre>
-<pre><code>##         [,1]
-## [1,] 33634.7</code></pre>
-<pre class="r"><code>#linear regression model
 
 my_lm = function(response, covariates, alpha = 0.05) {
   
@@ -205,8 +197,26 @@ my_lm = function(response, covariates, alpha = 0.05) {
   p &lt;- dim(covariates)[2]
   df &lt;- n - p
   
-  # Estimate beta through optimization(see above in example)
+  # Estimate beta through optimization()
+  x= covariates
+  y= response
+  beta_zero&lt;- NA
+  p&lt;- dim(x)[2]
+  beta_zero[1] &lt;- mean(y)
+
+  #continuing to fill in beta_zero
+
+  for (i in 2:p) {
+    beta_zero[i]&lt;- cov(y,x[,i])/var(x[,i])
+  }
+
   
+  #make sure beta hat function works for y x and betazero
+  
+  beta_hat_func(y,x,beta_zero)
+  
+  betahat_optimize&lt;- optim(beta_zero, function (z) beta_hat_func(y,x,z))
+  beta.hat&lt;- betahat_optimize $par
   
   # Estimate of the residual variance (sigma2) from Eq. (6.3)
   # Compute residuals
@@ -214,7 +224,8 @@ my_lm = function(response, covariates, alpha = 0.05) {
   sigma2.hat &lt;- (1/df)*t(resid)%*%resid
   
   # Estimate of the variance of the estimated beta from Eq. (6.2)
-  var.beta &lt;- sigma2.hat*solve(t(covariates)%*%covariates)
+  var.beta &lt;- as.vector(sigma2.hat)*diag(solve(t(covariates)%*%covariates))
+  #var.beta &lt;- sigma2.hat*solve(t(covariates)%*%covariates)
   
   # Estimate of the confidence interval based on alpha
   quant &lt;- 1 - alpha/2
@@ -224,7 +235,23 @@ my_lm = function(response, covariates, alpha = 0.05) {
   # Return all estimated values
   return(list(beta = beta.hat, sigma2 = sigma2.hat, 
               variance_beta = var.beta, ci = ci.beta))
-}</code></pre>
+}
+
+my_lm(y,x)</code></pre>
+<pre><code>## $beta
+## [1] 0.3584129 0.3466105 0.5267591
+## 
+## $sigma2
+##         [,1]
+## [1,] 16.7767
+## 
+## $variance_beta
+##           1        temp        wind 
+## 0.681190681 0.001016738 0.010679458 
+## 
+## $ci
+##          1       temp       wind          1       temp       wind 
+## -1.2592292  0.2841144  0.3242136  1.9760550  0.4091066  0.7293047</code></pre>
 
 
 
