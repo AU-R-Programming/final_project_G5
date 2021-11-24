@@ -4,3 +4,62 @@ author: "Preston R. Graben, Jessica Hofstetter, Yida Bao"
 output: html_document
 ---
 
+```{r}
+class_data <- read.csv("forestfires.csv")
+
+#Function to minimize to achieve beta estimate
+
+beta_hat_func = function(y, x, beta){
+   
+    return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
+}
+
+#Test data
+y<- class_data[,"ISI"]
+x<- class_data[,c("temp","wind")]
+x<- cbind(1,x)
+
+#initial beta
+beta_zero<- c(mean(y), cov(y,x[,2])/var(x[,2]), cov(y,x[,3])/var(x[,3]) )
+
+#make sure beta hat function works for y x and betazero
+
+beta_hat_func(y,x,beta_zero)
+
+#linear regression model
+
+my_lm = function(response, covariates, alpha = 0.05) {
+  
+  # Make sure data formats are appropriate
+  response <- as.vector(response)
+  covariates <- as.matrix(covariates)
+  
+  # Define parameters
+  n <- length(response)
+  p <- dim(covariates)[2]
+  df <- n - p
+  
+  # Estimate beta through optimization(see above in example)
+  
+  
+  # Estimate of the residual variance (sigma2) from Eq. (6.3)
+  # Compute residuals
+  resid <- response - covariates%*%as.matrix(beta.hat) 
+  sigma2.hat <- (1/df)*t(resid)%*%resid
+  
+  # Estimate of the variance of the estimated beta from Eq. (6.2)
+  var.beta <- sigma2.hat*solve(t(covariates)%*%covariates)
+  
+  # Estimate of the confidence interval based on alpha
+  quant <- 1 - alpha/2
+  ci.beta <- c(beta.hat - qnorm(p = quant)*sqrt(var.beta), beta.hat + 
+                 qnorm(p = quant)*sqrt(var.beta))
+  
+  # Return all estimated values
+  return(list(beta = beta.hat, sigma2 = sigma2.hat, 
+              variance_beta = var.beta, ci = ci.beta))
+}
+
+
+```
+
