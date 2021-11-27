@@ -5,7 +5,7 @@ output: html_document
 ---
 
 ```{r}
-class_data <- read.csv("forestfires.csv")
+library(ggplot2)
 
 #Function to minimize to achieve beta estimate
 
@@ -14,10 +14,7 @@ beta_hat_func = function(y, x, beta){
     return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
 }
 
-#Test data (example is forestfires.csv)
-y<- class_data[,"ISI"]
-x<- class_data[,c("temp","wind")]
-x<- cbind(1,x)
+
 
 
 
@@ -34,6 +31,8 @@ my_lm = function(response, covariates, alpha = 0.05) {
   
   # Estimate beta through optimization()
   x= covariates
+  x<- cbind(1,x)
+  covariates = x
   y= response
   beta_zero<- NA
   p<- dim(x)[2]
@@ -66,12 +65,78 @@ my_lm = function(response, covariates, alpha = 0.05) {
   quant <- 1 - alpha/2
   ci.beta <- c(beta.hat - qnorm(p = quant)*sqrt(var.beta), beta.hat + 
                  qnorm(p = quant)*sqrt(var.beta))
+  # Estimate yhat
+  yhat<- x %*% as.matrix(beta.hat)
+  
+  #calulate SSE
+  SSE<- sum((y-yhat)^2)
+  
+  
+  #calculate SST
+  SST<- sum((y-mean(y))^2)
+  
+  #Calulate R^2
+  
+  Rsquared<- 1-(SSE/SST)
+  
+  #calculate Cp
+  
+  cp<- SSE + 2*p*sigma2.hat
+  
+  #calculate DFM
+  DFM<- p-1
+  
+  #calculate DFE
+  
+  DFE<- n-p
+  
+  #calculate SSM
+  
+  SSM<- sum((yhat-mean(y))^2)
+  
+  #calculate MSM
+  
+  MSM<- SSM/DFM
+  
+  #calculate MSE
+  
+  MSE<- SSE/ DFE
+  
+  #calculate Fstar
+  fstar<- MSM/MSE
+  
+  #calculate fpvalue
+  fpvalue<- pf(fstar,DFM, DFE)
+  
+  #Plot residuals vs yhat
+  ggplot() + geom_point(aes(x=yhat,y=resid))
   
   # Return all estimated values
   return(list(beta = beta.hat, sigma2 = sigma2.hat, 
-              variance_beta = var.beta, ci = ci.beta))
+              variance_beta = var.beta, ci = ci.beta, r2= Rsquared, Cp= cp, Fteststat= fstar, pvalue= fpvalue))
 }
 
+
+```
+
+
+
+#Example
+
+```{r}
+#Example Data forestfires.csv
+class_data <- read.csv("forestfires.csv")
+
+#Assign data (example is forestfires.csv)
+
+y<- class_data[,"ISI"]
+x<- class_data[,c("temp","wind")]
+
+
+ 
+#Run function
+
 my_lm(y,x)
+
 ```
 
