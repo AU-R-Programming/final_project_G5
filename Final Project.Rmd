@@ -109,7 +109,15 @@ my_lm = function(response, covariates, alpha = 0.05) {
   fpvalue<- pf(fstar,DFM, DFE)
   
   #Plot residuals vs yhat
+  resid_vs_fitted <- ggplot() + geom_point(aes(x= yhat, y= resid))
   
+  plot(resid_vs_fitted)
+  
+  # Plot qq-plot of residuals
+  qqnorm(resid)
+  
+  # Histogram of residuals
+  hist(resid)
   
   # Return all estimated values
   return(list(beta = beta.hat, sigma2 = sigma2.hat, 
