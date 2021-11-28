@@ -170,7 +170,7 @@ pre code {
 </div>
 
 
-<pre class="r"><code>class_data &lt;- read.csv(&quot;forestfires.csv&quot;)
+<pre class="r"><code>library(ggplot2)
 
 #Function to minimize to achieve beta estimate
 
@@ -179,10 +179,7 @@ beta_hat_func = function(y, x, beta){
     return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
 }
 
-#Test data (example is forestfires.csv)
-y&lt;- class_data[,&quot;ISI&quot;]
-x&lt;- class_data[,c(&quot;temp&quot;,&quot;wind&quot;)]
-x&lt;- cbind(1,x)
+
 
 
 
@@ -199,6 +196,8 @@ my_lm = function(response, covariates, alpha = 0.05) {
   
   # Estimate beta through optimization()
   x= covariates
+  x&lt;- cbind(1,x)
+  covariates = x
   y= response
   beta_zero&lt;- NA
   p&lt;- dim(x)[2]
@@ -224,34 +223,110 @@ my_lm = function(response, covariates, alpha = 0.05) {
   sigma2.hat &lt;- (1/df)*t(resid)%*%resid
   
   # Estimate of the variance of the estimated beta from Eq. (6.2)
-  var.beta &lt;- as.vector(sigma2.hat)*diag(solve(t(covariates)%*%covariates))
-  #var.beta &lt;- sigma2.hat*solve(t(covariates)%*%covariates)
+ 
+  var.beta &lt;- as.numeric(sigma2.hat)*solve(t(covariates)%*%covariates)
   
   # Estimate of the confidence interval based on alpha
   quant &lt;- 1 - alpha/2
   ci.beta &lt;- c(beta.hat - qnorm(p = quant)*sqrt(var.beta), beta.hat + 
                  qnorm(p = quant)*sqrt(var.beta))
+  # Estimate yhat
+  yhat&lt;- x %*% as.matrix(beta.hat)
+  
+  #calulate SSE
+  SSE&lt;- sum((y-yhat)^2)
+  
+  
+  #calculate SST
+  SST&lt;- sum((y-mean(y))^2)
+  
+  #Calulate R^2
+  
+  Rsquared&lt;- 1-(SSE/SST)
+  
+  #calculate Cp
+  
+  cp&lt;- SSE + 2*p*sigma2.hat
+  
+  #calculate DFM
+  DFM&lt;- p-1
+  
+  #calculate DFE
+  
+  DFE&lt;- n-p
+  
+  #calculate SSM
+  
+  SSM&lt;- sum((yhat-mean(y))^2)
+  
+  #calculate MSM
+  
+  MSM&lt;- SSM/DFM
+  
+  #calculate MSE
+  
+  MSE&lt;- SSE/ DFE
+  
+  #calculate Fstar
+  fstar&lt;- MSM/MSE
+  
+  #calculate fpvalue
+  fpvalue&lt;- pf(fstar,DFM, DFE)
+  
+  #Plot residuals vs yhat
+  
   
   # Return all estimated values
   return(list(beta = beta.hat, sigma2 = sigma2.hat, 
-              variance_beta = var.beta, ci = ci.beta))
-}
+              variance_beta = var.beta, ci = ci.beta, r2= Rsquared, Cp= cp, Fteststat= fstar, pvalue= fpvalue ))
+}</code></pre>
+<p>#Example</p>
+<pre class="r"><code>#Example Data forestfires.csv
+class_data &lt;- read.csv(&quot;forestfires.csv&quot;)
+
+#Assign data (example is forestfires.csv)
+
+y&lt;- class_data[,&quot;ISI&quot;]
+x&lt;- class_data[,c(&quot;temp&quot;,&quot;wind&quot;)]
+
+
+ 
+#Run function
 
 my_lm(y,x)</code></pre>
+<pre><code>## Warning in sqrt(var.beta): NaNs produced
+
+## Warning in sqrt(var.beta): NaNs produced</code></pre>
 <pre><code>## $beta
 ## [1] 0.3584129 0.3466105 0.5267591
 ## 
 ## $sigma2
-##         [,1]
-## [1,] 16.7767
+##          [,1]
+## [1,] 16.74412
 ## 
 ## $variance_beta
-##           1        temp        wind 
-## 0.681190681 0.001016738 0.010679458 
+##                           temp          wind
+##       0.67986798 -0.0221689409 -0.0569314914
+## temp -0.02216894  0.0010147641  0.0007469358
+## wind -0.05693149  0.0007469358  0.0106587214
 ## 
 ## $ci
-##          1       temp       wind          1       temp       wind 
-## -1.2592292  0.2841144  0.3242136  1.9760550  0.4091066  0.7293047</code></pre>
+##  [1] -1.2576580        NaN        NaN        NaN  0.2841752  0.4731930
+##  [7]        NaN  0.2930445  0.3244103  1.9744837        NaN        NaN
+## [13]        NaN  0.4090459  0.5803252        NaN  0.4001766  0.7291079
+## 
+## $r2
+## [1] 0.1961227
+## 
+## $Cp
+##          [,1]
+## [1,] 8723.686
+## 
+## $Fteststat
+## [1] 62.72282
+## 
+## $pvalue
+## [1] 1</code></pre>
 
 
 

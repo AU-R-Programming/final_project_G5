@@ -58,8 +58,8 @@ my_lm = function(response, covariates, alpha = 0.05) {
   sigma2.hat <- (1/df)*t(resid)%*%resid
   
   # Estimate of the variance of the estimated beta from Eq. (6.2)
-  var.beta <- as.vector(sigma2.hat)*diag(solve(t(covariates)%*%covariates))
-  #var.beta <- sigma2.hat*solve(t(covariates)%*%covariates)
+ 
+  var.beta <- as.numeric(sigma2.hat)*solve(t(covariates)%*%covariates)
   
   # Estimate of the confidence interval based on alpha
   quant <- 1 - alpha/2
@@ -109,11 +109,11 @@ my_lm = function(response, covariates, alpha = 0.05) {
   fpvalue<- pf(fstar,DFM, DFE)
   
   #Plot residuals vs yhat
-  ggplot() + geom_point(aes(x=yhat,y=resid))
+  
   
   # Return all estimated values
   return(list(beta = beta.hat, sigma2 = sigma2.hat, 
-              variance_beta = var.beta, ci = ci.beta, r2= Rsquared, Cp= cp, Fteststat= fstar, pvalue= fpvalue))
+              variance_beta = var.beta, ci = ci.beta, r2= Rsquared, Cp= cp, Fteststat= fstar, pvalue= fpvalue ))
 }
 
 
