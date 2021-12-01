@@ -1,0 +1,27 @@
+{
+    "id": "DEDFDA17",
+    "path": "~/GitHub/lmg5/R/lmg5.R",
+    "project_path": "R/lmg5.R",
+    "type": "r_source",
+    "hash": "636260876",
+    "contents": "",
+    "dirty": false,
+    "created": 1638320675798.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "19,18",
+        "scrollLine": "8"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1638321223,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1638321223603,
+    "read_only": false,
+    "read_only_alternatives": []
+}
