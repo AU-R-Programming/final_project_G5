@@ -1,0 +1,19 @@
+Package: lmg5
+Type: Package
+Title: Linear regression function for final
+Version: 0.1.0
+Authors@R: c(
+    person("Jessica", "Hofstetter", email = "jnh0051@auburn.edu", 
+    role = c("aut","cre")),
+    person("Preston", "Graben", role = "aut"),
+    person("Yida", "Bao", role = "aut"))
+Maintainer: Jessica Hofstetter <jnh0051@auburn.edu>
+Description: This package contains the basic functions to perform linear 
+    regression without using any of the linear regression functions already
+    available
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Imports: 
+  ggplot2
+RoxygenNote: 7.1.2
