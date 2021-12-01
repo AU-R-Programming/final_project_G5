@@ -133,7 +133,7 @@ my_lm = function(response, covariates, alpha = 0.05) {
 #Example
 
 ```{r}
-#Example Data forestfires.csv
+#Example about Data forestfires.csv
 class_data <- read.csv("forestfires.csv")
 
 #Assign data (example is forestfires.csv)
