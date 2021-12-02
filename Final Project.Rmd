@@ -45,7 +45,7 @@ my_lm = function(response, covariates, alpha = 0.05) {
   }
 
   
-  #make sure beta hat function works for y x and betazero
+  #make sure that beta hat function works for y x and betazero
   
   beta_hat_func(y,x,beta_zero)
   
