@@ -21,16 +21,8 @@
 #' @importFrom ggplot2 ggplot
 #' @export
 #' @examples
-#' #Example Data forestfires.csv
-#' class_data <- read.csv("forestfires.csv")
-#' Assign data (example is forestfires.csv)
-#' y<- class_data[,"ISI"]
-#' x<- class_data[,c("temp","wind")]
-#' Run function
-#' lmg5(y,x)
-
-
-
+#' data(cars)
+#' lmg5(cars$speed, cars$dist, alpha = 0.5)
 lmg5 = function(response, covariates, alpha = 0.05) {
 
   library(ggplot2)

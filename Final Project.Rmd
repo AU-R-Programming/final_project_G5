@@ -3,6 +3,13 @@ title: "Final Project"
 author: "Preston R. Graben, Jessica Hofstetter,Yida Bao"
 output: html_document
 ---
+devtools::install_github("AU-R-Programming/final_project_G5")
+
+
+
+
+
+
 
 ```{r}
 library(ggplot2)

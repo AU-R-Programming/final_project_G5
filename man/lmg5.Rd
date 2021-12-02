@@ -32,13 +32,8 @@ regression without using any of the linear regression functions already
 available
 }
 \examples{
-#Example Data forestfires.csv
-class_data <- read.csv("forestfires.csv")
-Assign data (example is forestfires.csv)
-y<- class_data[,"ISI"]
-x<- class_data[,c("temp","wind")]
-Run function
-lmg5(y,x)
+data(cars)
+lmg5(cars$speed, cars$dist, alpha = 0.5)
 }
 \author{
 Group 5
