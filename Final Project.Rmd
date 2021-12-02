@@ -1,29 +1,65 @@
 ---
-title: "Final Project"
-author: "Preston R. Graben, Jessica Hofstetter,Yida Bao"
+title: "lmg5 Linear Regression R Package"
+author: "Preston R. Graben, Jessica Hofstetter, Yida Bao"
 output: html_document
 ---
+<br>
+
+### Description
+The following file describes how our package lmg5 was written and how to use it. The top of this document describes what all the parameters are and what the output will be. You can also see how these things are calculated by reading the comments found within the R code. At the very bottom of this document you will find an example of how to use the function as well as what the outputs are. 
+
+
+The package can be found on github in the AU-R-Programming repository. Inside the project is saved in the final_project_G5 repository. To download this package from github, copy and paste the following code into the console of your RStudio session: 
 devtools::install_github("AU-R-Programming/final_project_G5")
 
 
+Be sure to remember to include library(lmg5) in your code when you wish to use the lmg5 function. 
 
+<br>
 
+### Parameters
+Parameter - response - A vector of length n to denote response variable.
 
+Parameter - covariate - A matrix of dimension n*p denoting covariate. 
 
+Parameter - alpha A number used to denote the significance level.
+
+<br>
+
+### This function returns the following attributes:
+
+beta - Estimated coefficients
+
+sigma2 - Estimated variance
+
+variance_beta - variance of beta
+
+ci - Confidence interval
+
+r2 - Goodness of fit
+
+Cp - Mallows' Cp
+
+Fteststat - F-test statistic
+
+pvalue - p-value of F-test statistic
+
+plot of residuals
+
+qq-plot of residuals
+
+residuals histograms plot
+
+<br>
 
 ```{r}
 library(ggplot2)
 
 #Function to minimize to achieve beta estimate
-
 beta_hat_func = function(y, x, beta){
    
     return((t(y-as.matrix(x)%*%beta))%*%(y-as.matrix(x)%*%beta))
 }
-
-
-
-
 my_lm = function(response, covariates, alpha = 0.05) {
   
   # Make sure data formats are appropriate
@@ -36,7 +72,6 @@ my_lm = function(response, covariates, alpha = 0.05) {
   df <- n - p
   
   # Estimate beta through optimization()
-  
   x= covariates
   x<- cbind(1,x)
   covariates = x
@@ -46,16 +81,12 @@ my_lm = function(response, covariates, alpha = 0.05) {
   beta_zero[1] <- mean(y)
 
   #continuing to fill in beta_zero
-
   for (i in 2:p) {
     beta_zero[i]<- cov(y,x[,i])/var(x[,i])
   }
 
-  
   #make sure that beta hat function works for y x and betazero
-  
   beta_hat_func(y,x,beta_zero)
-  
   betahat_optimize<- optim(beta_zero, function (z) beta_hat_func(y,x,z))
   beta.hat<- betahat_optimize $par
   
@@ -65,7 +96,6 @@ my_lm = function(response, covariates, alpha = 0.05) {
   sigma2.hat <- (1/df)*t(resid)%*%resid
   
   # Estimate of the variance of the estimated beta from Eq. (6.2)
- 
   var.beta <- as.numeric(sigma2.hat)*solve(t(covariates)%*%covariates)
   
   # Estimate of the confidence interval based on alpha
@@ -78,36 +108,28 @@ my_lm = function(response, covariates, alpha = 0.05) {
   #calulate SSE
   SSE<- sum((y-yhat)^2)
   
-  
   #calculate SST
-  
   SST<- sum((y-mean(y))^2)
   
   #Calulate R^2
-  
   Rsquared<- 1-(SSE/SST)
   
   #calculate Cp
-  
   cp<- SSE + 2*p*sigma2.hat
   
   #calculate DFM
   DFM<- p-1
   
   #calculate DFE
-  
   DFE<- n-p
   
   #calculate SSM
-  
   SSM<- sum((yhat-mean(y))^2)
   
   #calculate MSM
-  
   MSM<- SSM/DFM
   
   #calculate MSE
-  
   MSE<- SSE/ DFE
   
   #calculate Fstar
@@ -135,24 +157,18 @@ my_lm = function(response, covariates, alpha = 0.05) {
 
 ```
 
+<br>
+<br>
 
+# Example
 
-#Example
+Here we will show an example of how to use the function as well as show 
+the outputs that the function returns. 
 
 ```{r}
-#Example about Data forestfires.csv
-class_data <- read.csv("forestfires.csv")
-
-#Assign data (example is forestfires.csv)
-
-y<- class_data[,"ISI"]
-x<- class_data[,c("temp","wind")]
-
-
- 
-#Run function
-
-my_lm(y,x)
-
+#Example about Data cars
+library(lmg5)
+data(cars)
+lmg5(cars$speed, cars$dist, alpha = 0.5)
 ```
 
